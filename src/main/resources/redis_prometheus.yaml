@@ -1,0 +1,315 @@
+title: Redis Prometheus
+datasource: local-prom
+refresh: 30s
+schemaVersion: 1
+time:
+  from: now-1h
+  to: now
+templating:
+  - name: addr
+    type: query
+    datasource: local-prom
+    query: label_values(redis_up, addr)
+    refresh: 1
+panels:
+  - title: Uptime
+    datasource: local-prom
+    type: singlestat
+    format: s
+    fill: 1
+    linewidth: 1
+    lines: true
+    decimals: 0
+    gridPos:
+      h: 7
+      w: 4
+      x: 0
+      y: 0
+    targets:
+      - refId: A
+        expr: redis_uptime_in_seconds{addr="$addr"}
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Clients
+    datasource: local-prom
+    type: singlestat
+    fill: 1
+    linewidth: 1
+    lines: true
+    decimals: 0
+    valueName: current
+    gridPos:
+      h: 7
+      w: 4
+      x: 4
+      y: 0
+    targets:
+      - refId: A
+        expr: redis_connected_clients{addr="$addr"}
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Commands Executed / sec
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    stack: true
+    legend:
+      show: false
+    tooltip:
+      valueType: cumulative
+    gridPos:
+      h: 7
+      w: 8
+      x: 8
+      y: 0
+    targets:
+      - refId: A
+        expr: rate(redis_commands_processed_total{addr=~"$addr"}[5m])
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Hits vs Misses / sec
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    decimals: 2
+    legend:
+      show: true
+    gridPos:
+      h: 7
+      w: 8
+      x: 16
+      y: 0
+    targets:
+      - refId: A
+        expr: irate(redis_keyspace_hits_total{addr="$addr"}[5m])
+        legendFormat: hits
+        intervalFactor: 2
+      - refId: B
+        expr: irate(redis_keyspace_misses_total{addr="$addr"}[5m])
+        legendFormat: misses
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        min: 0
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Total Memory Usage
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    decimals: 2
+    legend:
+      show: true
+    gridPos:
+      h: 7
+      w: 12
+      x: 0
+      y: 7
+    targets:
+      - refId: A
+        expr: redis_memory_used_bytes{addr=~"$addr"}
+        legendFormat: used
+        intervalFactor: 2
+      - refId: B
+        expr: redis_memory_max_bytes{addr=~"$addr"}
+        legendFormat: max
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Network I/O
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    gridPos:
+      h: 7
+      w: 12
+      x: 12
+      y: 7
+    targets:
+      - refId: A
+        expr: rate(redis_net_input_bytes_total{addr="$addr"}[5m])
+        legendFormat: "{{ input }}"
+        intervalFactor: 2
+      - refId: B
+        expr: rate(redis_net_output_bytes_total{addr="$addr"}[5m])
+        legendFormat: "{{ output }}"
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: bytes
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Total Items per DB
+    datasource: local-prom
+    type: graph
+    fill: 7
+    linewidth: 2
+    lines: true
+    stack: true
+    nullPointMode: connected
+    legend:
+      show: true
+      alignAsTable: true
+      rightSide: true
+      current: true
+    gridPos:
+      h: 7
+      w: 12
+      x: 0
+      y: 14
+    targets:
+      - refId: A
+        expr: sum (redis_db_keys{addr=~"$addr"}) by (db)
+        legendFormat: "{{ db }}"
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Expiring vs Not-Expiring Keys
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    stack: true
+    gridPos:
+      h: 7
+      w: 12
+      x: 12
+      y: 14
+    targets:
+      - refId: A
+        expr: sum (redis_db_keys{addr=~"$addr"}) - sum (redis_db_keys_expiring{addr=~"$addr"})
+        legendFormat: not expiring
+        intervalFactor: 2
+      - refId: B
+        expr: sum (redis_db_keys_expiring{addr=~"$addr"})
+        legendFormat: expiring
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Expired vs Evicted Keys
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    nullPointMode: connected
+    gridPos:
+      h: 7
+      w: 12
+      x: 0
+      y: 21
+    targets:
+      - refId: A
+        expr: sum(rate(redis_expired_keys_total{addr=~"$addr"}[5m])) by (addr)
+        legendFormat: expired
+        intervalFactor: 2
+      - refId: B
+        expr: sum(rate(redis_evicted_keys_total{addr=~"$addr"}[5m])) by (addr)
+        legendFormat: evicted
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        min: 0
+        show: true
+      - format: short
+        logBase: 1
+        show: true
+  - title: Command Calls / sec
+    datasource: local-prom
+    type: graph
+    fill: 1
+    linewidth: 2
+    lines: true
+    gridPos:
+      h: 7
+      w: 12
+      x: 12
+      y: 21
+    targets:
+      - refId: A
+        expr: topk(5, irate(redis_command_call_duration_seconds_count{addr=~"$addr"} [1m]))
+        legendFormat: "{{ cmd }}"
+        intervalFactor: 2
+    xaxis:
+      show: true
+      mode: time
+    yaxes:
+      - format: short
+        logBase: 1
+        show: true
+      - format: short
+        logBase: 1
+        show: true
