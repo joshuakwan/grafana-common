@@ -34,16 +34,20 @@ public class GrafanaStory {
     }
 
     @Step("Create dashboard from YAML file <filename>")
-    public void testYaml(String filename) throws IOException, GrafanaException {
+    public void testCreateDashboard(String filename)
+            throws IOException, GrafanaException {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream(filename);
-        System.out.print(this.grafana.createDashboard(is));
+        DashboardSuccessfulPost resp = this.grafana.createDashboard(is);
+        assertNotNull(resp);
+        this.newDashboardUid = resp.uid();
+        System.out.print(resp);
     }
 
 
     @Step("Get the uid of dashboard <dashboardTitle>")
     public void testSearchDashboard(String dashboardTitle) {
-        String uid = this.grafana.getDashboardUid(dashboardTitle, null);
+        String uid = this.grafana.getDashboardUid(dashboardTitle);
         assertEquals(this.newDashboardUid, uid);
         System.out.println(uid);
     }
@@ -65,13 +69,23 @@ public class GrafanaStory {
         }
     }
 
-    @Step("Delete dashboard <dashboardName>")
-    public void testDeleteGrafanaDashboard(String dashboardName) {
+    @Step("Update dashboard <dashboardTitle> from YAML file <filename>")
+    public void testUpdateDashboard(String dashboardTitle, String filename)
+            throws IOException, GrafanaException {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classloader.getResourceAsStream(filename);
+        DashboardSuccessfulPost resp = this.grafana.updateDashboard(dashboardTitle,is);
+        assertNotNull(resp);
+    }
+
+    @Step("Delete dashboard <dashboardTitle>")
+    public void testDeleteGrafanaDashboard(String dashboardTitle) {
         try {
-            String nameDeleted = this.grafana.deleteDashboardByName(dashboardName);
-            assertNotNull(nameDeleted);
+            String nameDeleted = this.grafana.deleteDashboard(dashboardTitle);
+            assertEquals(dashboardTitle, nameDeleted);
+            System.out.println(nameDeleted);
         } catch (GrafanaDashboardDoesNotExistException e) {
-            fail("Dashboard " + dashboardName + " not exist");
+            fail("Dashboard " + dashboardTitle + " not exist");
         } catch (GrafanaDashboardCouldNotDeleteException e) {
             fail("Shit happens with Grafana");
         } catch (IOException e) {

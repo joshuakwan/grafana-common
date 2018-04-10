@@ -20,6 +20,13 @@ import java.util.Arrays;
 public class Grafana {
     private GrafanaClient client;
 
+    /*
+    Initialize a Grafana API object
+
+    @param baseUrl base url of grafana
+    @param auth grafana auth string
+
+    */
     public Grafana(String baseUrl, String auth) {
         GrafanaConfiguration config = new GrafanaConfiguration().host(baseUrl).apiKey(auth);
         this.client = new GrafanaClient(config);
@@ -27,10 +34,66 @@ public class Grafana {
 
     public DashboardSuccessfulPost createDashboard(InputStream yamlStream)
             throws IOException, GrafanaException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        grafana.beans.Dashboard data = mapper.readValue(yamlStream, grafana.beans.Dashboard.class);
-        System.out.println(data);
+        grafana.beans.Dashboard data = getYamlData(yamlStream);
+        GrafanaDashboard grafanaDashboard = buildGrafanaDashboard(data);
+        return this.client.createDashboard(grafanaDashboard);
+    }
 
+    public String deleteDashboard(String dashboardTitle, String dashboardFolder)
+            throws GrafanaDashboardDoesNotExistException, GrafanaDashboardCouldNotDeleteException, IOException {
+        String uid = this.getDashboardUid(dashboardTitle, dashboardFolder);
+        return this.client.deleteDashboard(uid);
+    }
+
+    public String deleteDashboard(String dashboardTitle)
+            throws GrafanaDashboardDoesNotExistException, GrafanaDashboardCouldNotDeleteException, IOException {
+        String uid = this.getDashboardUid(dashboardTitle);
+        return this.client.deleteDashboard(uid);
+    }
+
+    public DashboardSuccessfulPost updateDashboard(String dashboardTitle, InputStream yamlStream)
+            throws IOException, GrafanaException {
+        // 1. get existing dashboard
+        GrafanaDashboard existingDashboard = this.getDashboard(dashboardTitle);
+
+        // 2. build new dashboard
+        grafana.beans.Dashboard data = getYamlData(yamlStream);
+        GrafanaDashboard newDashboard = buildGrafanaDashboard(data);
+
+        // 3. make the update
+        // 3.1. specify the version
+        newDashboard.dashboard().version(existingDashboard.dashboard().version());
+        // 3.2. set uid so the dashboard won't be created again
+        newDashboard.dashboard().uid(existingDashboard.dashboard().uid());
+
+        return this.client.updateDashboard(newDashboard);
+    }
+
+    public GrafanaDashboard getDashboard(String dashboardTitle, String dashboardFolder)
+            throws IOException, GrafanaException {
+        String uid = this.getDashboardUid(dashboardTitle, dashboardFolder);
+        return this.client.getDashboard(uid);
+    }
+
+    public GrafanaDashboard getDashboard(String dashboardTitle)
+            throws IOException, GrafanaException {
+        return this.getDashboard(dashboardTitle, null);
+    }
+
+    public String getDashboardUid(String dashboardTitle, String dashboardFolder) {
+        return this.client.searchDashboard(dashboardTitle, dashboardFolder);
+    }
+
+    public String getDashboardUid(String dashboardTitle) {
+        return this.client.searchDashboard(dashboardTitle, null);
+    }
+
+    private grafana.beans.Dashboard getYamlData(InputStream yamlStream) throws IOException {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        return mapper.readValue(yamlStream, grafana.beans.Dashboard.class);
+    }
+
+    private GrafanaDashboard buildGrafanaDashboard(grafana.beans.Dashboard data) {
         Dashboard dashboard = new Dashboard();
         dashboard.title(data.getTitle());
         dashboard.refresh(data.getRefresh());
@@ -85,12 +148,8 @@ public class Grafana {
                     DashboardPanelTarget target = new DashboardPanelTarget();
                     target.refId(targetData.getRefId());
                     target.expr(targetData.getExpr());
-                    if (targetData.getLegendFormat() != null) {
-                        target.legendFormat(targetData.getLegendFormat());
-                    }
-                    if (targetData.getIntervalFactor() != null) {
-                        target.intervalFactor(targetData.getIntervalFactor());
-                    }
+                    target.legendFormat(targetData.getLegendFormat());
+                    target.intervalFactor(targetData.getIntervalFactor());
 
                     targets.add(target);
                 }
@@ -172,23 +231,6 @@ public class Grafana {
 
         dashboard.panels(panels);
         DashboardMeta dashboardMeta = new DashboardMeta().canSave(true).slug(data.getTitle());
-        GrafanaDashboard grafanaDashboard = new GrafanaDashboard().meta(dashboardMeta).dashboard(dashboard);
-        return this.client.createDashboard(grafanaDashboard);
-    }
-
-    public String deleteDashboardByName(String name)
-            throws GrafanaDashboardDoesNotExistException, GrafanaDashboardCouldNotDeleteException, IOException {
-        return this.client.deleteDashboard(name);
-    }
-
-
-    public GrafanaDashboard getDashboard(String dashboardTitle, String dashboardFolder)
-            throws IOException, GrafanaException {
-        String uid = this.getDashboardUid(dashboardTitle, dashboardFolder);
-        return this.client.getDashboard(uid);
-    }
-
-    public String getDashboardUid(String dashboardTitle, String dashboardFolder) {
-        return this.client.searchDashboard(dashboardTitle, dashboardFolder);
+        return new GrafanaDashboard().meta(dashboardMeta).dashboard(dashboard);
     }
 }
