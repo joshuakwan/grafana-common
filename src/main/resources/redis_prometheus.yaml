@@ -1,7 +1,6 @@
-title: Redis Prometheus
+title: Redis
 datasource: local-prom
 refresh: 30s
-schemaVersion: 1
 time:
   from: now-1h
   to: now
@@ -16,9 +15,6 @@ panels:
     datasource: local-prom
     type: singlestat
     format: s
-    fill: 1
-    linewidth: 1
-    lines: true
     decimals: 0
     gridPos:
       h: 7
@@ -28,22 +24,19 @@ panels:
     targets:
       - refId: A
         expr: redis_uptime_in_seconds{addr="$addr"}
-    xaxis:
-      show: true
-      mode: time
-    yaxes:
-      - format: short
-        logBase: 1
-        show: true
-      - format: short
-        logBase: 1
-        show: true
+#    xaxis:
+#      show: true
+#      mode: time
+#    yaxes:
+#      - format: short
+#        logBase: 1
+#        show: true
+#      - format: short
+#        logBase: 1
+#        show: true
   - title: Clients
     datasource: local-prom
     type: singlestat
-    fill: 1
-    linewidth: 1
-    lines: true
     decimals: 0
     valueName: current
     gridPos:
@@ -54,27 +47,28 @@ panels:
     targets:
       - refId: A
         expr: redis_connected_clients{addr="$addr"}
-    xaxis:
-      show: true
-      mode: time
-    yaxes:
-      - format: short
-        logBase: 1
-        show: true
-      - format: short
-        logBase: 1
-        show: true
+#    xaxis:
+#      show: true
+#      mode: time
+#    yaxes:
+#      - format: short
+#        logBase: 1
+#        show: true
+#      - format: short
+#        logBase: 1
+#        show: true
   - title: Commands Executed / sec
     datasource: local-prom
     type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     stack: true
     legend:
       show: false
     tooltip:
       valueType: cumulative
+    repeat: addr
+    repeatDirection: v
+    minSpan: 5
     gridPos:
       h: 7
       w: 8
@@ -85,21 +79,14 @@ panels:
         expr: rate(redis_commands_processed_total{addr=~"$addr"}[5m])
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: short
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Hits vs Misses / sec
     datasource: local-prom
     type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     decimals: 2
     legend:
       show: true
@@ -130,10 +117,7 @@ panels:
         show: true
   - title: Total Memory Usage
     datasource: local-prom
-    type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     decimals: 2
     legend:
       show: true
@@ -163,10 +147,7 @@ panels:
         show: true
   - title: Network I/O
     datasource: local-prom
-    type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     gridPos:
       h: 7
       w: 12
@@ -193,10 +174,8 @@ panels:
         show: true
   - title: Total Items per DB
     datasource: local-prom
-    type: graph
     fill: 7
     linewidth: 2
-    lines: true
     stack: true
     nullPointMode: connected
     legend:
@@ -308,8 +287,4 @@ panels:
       mode: time
     yaxes:
       - format: short
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true

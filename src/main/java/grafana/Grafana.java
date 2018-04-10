@@ -55,6 +55,7 @@ public class Grafana {
             throws IOException, GrafanaException {
         // 1. get existing dashboard
         GrafanaDashboard existingDashboard = this.getDashboard(dashboardTitle);
+        System.out.println(existingDashboard.dashboard().uid());
 
         // 2. build new dashboard
         grafana.beans.Dashboard data = getYamlData(yamlStream);
@@ -93,11 +94,15 @@ public class Grafana {
         return mapper.readValue(yamlStream, grafana.beans.Dashboard.class);
     }
 
+    private static <T> T getValue(T value, T defaultValue) {
+        return value == null ? defaultValue : value;
+    }
+
     private GrafanaDashboard buildGrafanaDashboard(grafana.beans.Dashboard data) {
         Dashboard dashboard = new Dashboard();
         dashboard.title(data.getTitle());
         dashboard.refresh(data.getRefresh());
-        dashboard.schemaVersion(data.getSchemaVersion());
+        dashboard.schemaVersion(getValue(data.getSchemaVersion(), 1));
         DashboardTime time = new DashboardTime().from(data.getTime().getFrom()).to(data.getTime().getTo());
         dashboard.time(time);
 
@@ -109,6 +114,8 @@ public class Grafana {
             templateList.datasource(templateData.getDatasource());
             templateList.query(templateData.getQuery());
             templateList.refresh(templateData.getRefresh());
+            templateList.multi(templateData.getMulti());
+            templateList.includeAll(templateData.getIncludeAll());
 
             templateLists.add(templateList);
         }
@@ -123,14 +130,17 @@ public class Grafana {
             panel.datasource(panelData.getDatasource());
 
             panel.format(panelData.getFormat());
-            panel.fill(panelData.getFill());
-            panel.linewidth(panelData.getLinewidth());
-            panel.lines(panelData.getLines());
+            panel.fill(getValue(panelData.getFill(), 1));
+            panel.linewidth(getValue(panelData.getLinewidth(), 1));
+            panel.lines(getValue(panelData.getLines(), true));
             panel.stack(panelData.getStack());
             panel.decimals(panelData.getDecimals());
             panel.valueName(panelData.getValueName());
+            panel.repeat(panelData.getRepeat());
+            panel.repeatDirection(panelData.getRepeatDirection());
+            panel.minSpan(panelData.getMinSpan());
 
-            switch (panelData.getType()) {
+            switch (getValue(panelData.getType(), "graph")) {
                 case "singlestat":
                     panel.type(DashboardPanel.Type.SINGLESTAT);
                     break;
@@ -179,52 +189,57 @@ public class Grafana {
             gridPos.y(panelData.getGridPos().getY());
             panel.gridPos(gridPos);
 
-            DashboardPanelXAxis xAxis = new DashboardPanelXAxis();
-            xAxis.show(panelData.getXaxis().getShow());
-            switch (panelData.getXaxis().getMode()) {
-                case "time":
-                    xAxis.mode(DashboardPanelXAxis.Mode.TIME);
-                    break;
-                default:
-                    xAxis.mode(DashboardPanelXAxis.Mode.TIME);
-                    break;
+            if (panelData.getXaxis() != null && panelData.getYaxes() != null) {
+                DashboardPanelXAxis xAxis = new DashboardPanelXAxis();
+
+                xAxis.show(getValue(panelData.getXaxis().getShow(), true));
+                switch (panelData.getXaxis().getMode()) {
+                    case "time":
+                        xAxis.mode(DashboardPanelXAxis.Mode.TIME);
+                        break;
+                    default:
+                        xAxis.mode(DashboardPanelXAxis.Mode.TIME);
+                        break;
+                }
+
+
+                DashboardPanelYAxis yLeftAxis = new DashboardPanelYAxis();
+
+                yLeftAxis.logBase(getValue(panelData.getYaxes().get(0).getLogBase(), 1));
+                yLeftAxis.show(getValue(panelData.getYaxes().get(0).getShow(), true));
+                yLeftAxis.min(panelData.getYaxes().get(0).getMin());
+
+                switch (panelData.getYaxes().get(0).getFormat()) {
+                    case "short":
+                        yLeftAxis.format(DashboardPanelYAxis.Format.SHORT);
+                        break;
+                    case "bytes":
+                        yLeftAxis.format(DashboardPanelYAxis.Format.BYTES);
+                        break;
+                    default:
+                        yLeftAxis.format(DashboardPanelYAxis.Format.NONE);
+                        break;
+                }
+
+                DashboardPanelYAxis yRightAxis = new DashboardPanelYAxis();
+                yRightAxis.logBase(getValue(panelData.getYaxes().get(1).getLogBase(), 1));
+                yRightAxis.show(getValue(panelData.getYaxes().get(1).getShow(), true));
+                yRightAxis.min(panelData.getYaxes().get(1).getMin());
+                switch (panelData.getYaxes().get(1).getFormat()) {
+                    case "short":
+                        yRightAxis.format(DashboardPanelYAxis.Format.SHORT);
+                        break;
+                    case "bytes":
+                        yRightAxis.format(DashboardPanelYAxis.Format.BYTES);
+                        break;
+                    default:
+                        yRightAxis.format(DashboardPanelYAxis.Format.NONE);
+                        break;
+                }
+
+                panel.xaxis(xAxis);
+                panel.yaxes(new ArrayList<>(Arrays.asList(yLeftAxis, yRightAxis)));
             }
-
-            DashboardPanelYAxis yLeftAxis = new DashboardPanelYAxis();
-            yLeftAxis.logBase(panelData.getYaxes().get(0).getLogBase());
-            yLeftAxis.show(panelData.getYaxes().get(0).getShow());
-            yLeftAxis.min(panelData.getYaxes().get(0).getMin());
-
-            switch (panelData.getYaxes().get(0).getFormat()) {
-                case "short":
-                    yLeftAxis.format(DashboardPanelYAxis.Format.SHORT);
-                    break;
-                case "bytes":
-                    yLeftAxis.format(DashboardPanelYAxis.Format.BYTES);
-                    break;
-                default:
-                    yLeftAxis.format(DashboardPanelYAxis.Format.NONE);
-                    break;
-            }
-
-            DashboardPanelYAxis yRightAxis = new DashboardPanelYAxis();
-            yRightAxis.logBase(panelData.getYaxes().get(1).getLogBase());
-            yRightAxis.show(panelData.getYaxes().get(1).getShow());
-            yRightAxis.min(panelData.getYaxes().get(1).getMin());
-            switch (panelData.getYaxes().get(1).getFormat()) {
-                case "short":
-                    yRightAxis.format(DashboardPanelYAxis.Format.SHORT);
-                    break;
-                case "bytes":
-                    yRightAxis.format(DashboardPanelYAxis.Format.BYTES);
-                    break;
-                default:
-                    yRightAxis.format(DashboardPanelYAxis.Format.NONE);
-                    break;
-            }
-
-            panel.xaxis(xAxis);
-            panel.yaxes(new ArrayList<>(Arrays.asList(yLeftAxis, yRightAxis)));
 
             panels.add(panel);
         }

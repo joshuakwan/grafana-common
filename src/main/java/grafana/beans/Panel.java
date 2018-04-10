@@ -43,6 +43,15 @@ public class Panel {
     String nullPointMode;
 
     @JsonProperty
+    String repeat;
+
+    @JsonProperty
+    String repeatDirection;
+
+    @JsonProperty
+    Integer minSpan;
+
+    @JsonProperty
     GridPosition gridPos;
 
     @JsonProperty
@@ -116,6 +125,26 @@ public class Panel {
         return tooltip;
     }
 
+    public String getNullPointMode() {
+        return nullPointMode;
+    }
+
+    public Legend getLegend() {
+        return legend;
+    }
+
+    public String getRepeat() {
+        return repeat;
+    }
+
+    public String getRepeatDirection() {
+        return repeatDirection;
+    }
+
+    public Integer getMinSpan() {
+        return minSpan;
+    }
+
     @Override
     public String toString() {
         return "Panel{" +
@@ -130,18 +159,15 @@ public class Panel {
                 ", decimals=" + decimals +
                 ", valueName='" + valueName + '\'' +
                 ", nullPointMode='" + nullPointMode + '\'' +
+                ", repeat='" + repeat + '\'' +
+                ", repeatDirection='" + repeatDirection + '\'' +
+                ", minSpan=" + minSpan +
                 ", gridPos=" + gridPos +
+                ", legend=" + legend +
+                ", tooltip=" + tooltip +
                 ", targets=" + targets +
                 ", xaxis=" + xaxis +
                 ", yaxes=" + yaxes +
                 '}';
-    }
-
-    public String getNullPointMode() {
-        return nullPointMode;
-    }
-
-    public Legend getLegend() {
-        return legend;
     }
 }

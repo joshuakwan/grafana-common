@@ -18,6 +18,12 @@ public class Template {
     @JsonProperty
     Integer refresh;
 
+    @JsonProperty
+    Boolean multi;
+
+    @JsonProperty
+    Boolean includeAll;
+
     public String getName() {
         return name;
     }
@@ -38,6 +44,14 @@ public class Template {
         return refresh;
     }
 
+    public Boolean getMulti() {
+        return multi;
+    }
+
+    public Boolean getIncludeAll() {
+        return includeAll;
+    }
+
     @Override
     public String toString() {
         return "Template{" +
@@ -46,6 +60,8 @@ public class Template {
                 ", datasource='" + datasource + '\'' +
                 ", query='" + query + '\'' +
                 ", refresh=" + refresh +
+                ", multi=" + multi +
+                ", includeAll=" + includeAll +
                 '}';
     }
 }
