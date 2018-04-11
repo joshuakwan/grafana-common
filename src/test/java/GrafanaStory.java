@@ -44,7 +44,6 @@ public class GrafanaStory {
         System.out.print(resp);
     }
 
-
     @Step("Get the uid of dashboard <dashboardTitle>")
     public void testSearchDashboard(String dashboardTitle) {
         String uid = this.grafana.getDashboardUid(dashboardTitle);

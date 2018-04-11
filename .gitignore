@@ -14,4 +14,7 @@ reports
 # Java sh*ts
 target/
 
-
+# IDE sh*ts
+.settings/
+.vscode/
+.idea/

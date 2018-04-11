@@ -20,18 +20,26 @@ import java.util.Arrays;
 public class Grafana {
     private GrafanaClient client;
 
-    /*
-    Initialize a Grafana API object
-
-    @param baseUrl base url of grafana
-    @param auth grafana auth string
-
-    */
+    /**
+     * Initialize a Grafana API object
+     *
+     * @param baseUrl base url of grafana
+     * @param auth    grafana auth string
+     */
     public Grafana(String baseUrl, String auth) {
         GrafanaConfiguration config = new GrafanaConfiguration().host(baseUrl).apiKey(auth);
         this.client = new GrafanaClient(config);
     }
 
+
+    /**
+     * Create a new dashboard from a YAML input stream
+     *
+     * @param yamlStream the YAML input stream
+     * @return the response object that contains essential information
+     * @throws IOException
+     * @throws GrafanaException
+     */
     public DashboardSuccessfulPost createDashboard(InputStream yamlStream)
             throws IOException, GrafanaException {
         grafana.beans.Dashboard data = getYamlData(yamlStream);
@@ -39,23 +47,65 @@ public class Grafana {
         return this.client.createDashboard(grafanaDashboard);
     }
 
+    /**
+     * Delete a dashboard by its title and folder
+     *
+     * @param dashboardTitle  the dashboard title
+     * @param dashboardFolder the folder name which contains the dashboard
+     * @return the title of the deleted dashboard
+     * @throws GrafanaDashboardDoesNotExistException
+     * @throws GrafanaDashboardCouldNotDeleteException
+     * @throws IOException
+     */
     public String deleteDashboard(String dashboardTitle, String dashboardFolder)
             throws GrafanaDashboardDoesNotExistException, GrafanaDashboardCouldNotDeleteException, IOException {
         String uid = this.getDashboardUid(dashboardTitle, dashboardFolder);
         return this.client.deleteDashboard(uid);
     }
 
+    /**
+     * Delete a dashboard by its title
+     *
+     * @param dashboardTitle the dashboard title
+     * @return the title of the deleted dashboard
+     * @throws GrafanaDashboardDoesNotExistException
+     * @throws GrafanaDashboardCouldNotDeleteException
+     * @throws IOException
+     */
     public String deleteDashboard(String dashboardTitle)
             throws GrafanaDashboardDoesNotExistException, GrafanaDashboardCouldNotDeleteException, IOException {
         String uid = this.getDashboardUid(dashboardTitle);
         return this.client.deleteDashboard(uid);
     }
 
+    /**
+     * Update a dashboard with a YAML input stream
+     *
+     * @param dashboardTitle the title of the dashboard to be updated
+     * @param yamlStream     the YAML stream which contains updated configuration
+     * @return the response object that contains essential information
+     * @throws IOException
+     * @throws GrafanaException
+     */
     public DashboardSuccessfulPost updateDashboard(String dashboardTitle, InputStream yamlStream)
             throws IOException, GrafanaException {
+        return this.updateDashboard(dashboardTitle, null, yamlStream);
+    }
+
+    /**
+     * Update a dashboard with a YAML input stream
+     *
+     * @param dashboardTitle  the title of the dashboard to be updated
+     * @param dashboardFolder the name of the folder which contains the dashboard to be updated
+     * @param yamlStream      the YAML stream which contains updated configuration
+     * @return the response object that contains essential information
+     * @throws IOException
+     * @throws GrafanaException
+     */
+    public DashboardSuccessfulPost updateDashboard(String dashboardTitle, String dashboardFolder, InputStream yamlStream)
+            throws IOException, GrafanaException {
         // 1. get existing dashboard
-        GrafanaDashboard existingDashboard = this.getDashboard(dashboardTitle);
-        System.out.println(existingDashboard.dashboard().uid());
+        GrafanaDashboard existingDashboard = this.getDashboard(dashboardTitle, dashboardFolder);
 
         // 2. build new dashboard
         grafana.beans.Dashboard data = getYamlData(yamlStream);
@@ -70,21 +120,51 @@ public class Grafana {
         return this.client.updateDashboard(newDashboard);
     }
 
+    /**
+     * Get a dashboard by its title and folder name
+     *
+     * @param dashboardTitle  the dashboard title
+     * @param dashboardFolder the name of the folder which contains the dashboard
+     * @return the dashboard object
+     * @throws IOException
+     * @throws GrafanaException
+     */
     public GrafanaDashboard getDashboard(String dashboardTitle, String dashboardFolder)
             throws IOException, GrafanaException {
         String uid = this.getDashboardUid(dashboardTitle, dashboardFolder);
         return this.client.getDashboard(uid);
     }
 
+    /**
+     * Get a dashboard by its title
+     *
+     * @param dashboardTitle the dashboard title
+     * @return the dashboard object
+     * @throws IOException
+     * @throws GrafanaException
+     */
     public GrafanaDashboard getDashboard(String dashboardTitle)
             throws IOException, GrafanaException {
         return this.getDashboard(dashboardTitle, null);
     }
 
+    /**
+     * Get the uid of a dashboard
+     *
+     * @param dashboardTitle the dashboard title
+     * @param dashboardFolder the name of the folder which contains the dashboard
+     * @return the dashboard uid
+     */
     public String getDashboardUid(String dashboardTitle, String dashboardFolder) {
         return this.client.searchDashboard(dashboardTitle, dashboardFolder);
     }
 
+    /**
+     * Get the uid of a dashboard
+     *
+     * @param dashboardTitle the dashboard title
+     * @return the dashboard uid
+     */
     public String getDashboardUid(String dashboardTitle) {
         return this.client.searchDashboard(dashboardTitle, null);
     }
@@ -202,12 +282,12 @@ public class Grafana {
                         break;
                 }
 
-
                 DashboardPanelYAxis yLeftAxis = new DashboardPanelYAxis();
 
                 yLeftAxis.logBase(getValue(panelData.getYaxes().get(0).getLogBase(), 1));
                 yLeftAxis.show(getValue(panelData.getYaxes().get(0).getShow(), true));
                 yLeftAxis.min(panelData.getYaxes().get(0).getMin());
+                yLeftAxis.max(panelData.getYaxes().get(0).getMax());
 
                 switch (panelData.getYaxes().get(0).getFormat()) {
                     case "short":
@@ -225,6 +305,8 @@ public class Grafana {
                 yRightAxis.logBase(getValue(panelData.getYaxes().get(1).getLogBase(), 1));
                 yRightAxis.show(getValue(panelData.getYaxes().get(1).getShow(), true));
                 yRightAxis.min(panelData.getYaxes().get(1).getMin());
+                yRightAxis.max(panelData.getYaxes().get(1).getMax());
+
                 switch (panelData.getYaxes().get(1).getFormat()) {
                     case "short":
                         yRightAxis.format(DashboardPanelYAxis.Format.SHORT);

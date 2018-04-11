@@ -24,16 +24,6 @@ panels:
     targets:
       - refId: A
         expr: redis_uptime_in_seconds{addr="$addr"}
-#    xaxis:
-#      show: true
-#      mode: time
-#    yaxes:
-#      - format: short
-#        logBase: 1
-#        show: true
-#      - format: short
-#        logBase: 1
-#        show: true
   - title: Clients
     datasource: local-prom
     type: singlestat
@@ -47,19 +37,8 @@ panels:
     targets:
       - refId: A
         expr: redis_connected_clients{addr="$addr"}
-#    xaxis:
-#      show: true
-#      mode: time
-#    yaxes:
-#      - format: short
-#        logBase: 1
-#        show: true
-#      - format: short
-#        logBase: 1
-#        show: true
   - title: Commands Executed / sec
     datasource: local-prom
-    type: graph
     linewidth: 2
     stack: true
     legend:
@@ -85,7 +64,6 @@ panels:
       - format: short
   - title: Hits vs Misses / sec
     datasource: local-prom
-    type: graph
     linewidth: 2
     decimals: 2
     legend:
@@ -109,12 +87,8 @@ panels:
       mode: time
     yaxes:
       - format: short
-        logBase: 1
         min: 0
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Total Memory Usage
     datasource: local-prom
     linewidth: 2
@@ -140,11 +114,7 @@ panels:
       mode: time
     yaxes:
       - format: short
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Network I/O
     datasource: local-prom
     linewidth: 2
@@ -163,15 +133,10 @@ panels:
         legendFormat: "{{ output }}"
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: bytes
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Total Items per DB
     datasource: local-prom
     fill: 7
@@ -194,21 +159,13 @@ panels:
         legendFormat: "{{ db }}"
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: short
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Expiring vs Not-Expiring Keys
     datasource: local-prom
-    type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     stack: true
     gridPos:
       h: 7
@@ -225,21 +182,13 @@ panels:
         legendFormat: expiring
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: short
-        logBase: 1
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Expired vs Evicted Keys
     datasource: local-prom
-    type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     nullPointMode: connected
     gridPos:
       h: 7
@@ -256,22 +205,14 @@ panels:
         legendFormat: evicted
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: short
-        logBase: 1
         min: 0
-        show: true
       - format: short
-        logBase: 1
-        show: true
   - title: Command Calls / sec
     datasource: local-prom
-    type: graph
-    fill: 1
     linewidth: 2
-    lines: true
     gridPos:
       h: 7
       w: 12
@@ -283,7 +224,6 @@ panels:
         legendFormat: "{{ cmd }}"
         intervalFactor: 2
     xaxis:
-      show: true
       mode: time
     yaxes:
       - format: short
