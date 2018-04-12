@@ -1,32 +1,25 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-
-import com.appnexus.grafana.client.GrafanaClient;
-import com.appnexus.grafana.client.models.*;
-import com.appnexus.grafana.configuration.GrafanaConfiguration;
+import com.appnexus.grafana.client.models.DashboardSuccessfulPost;
+import com.appnexus.grafana.client.models.GrafanaDashboard;
 import com.appnexus.grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
 import com.appnexus.grafana.exceptions.GrafanaDashboardDoesNotExistException;
 import com.appnexus.grafana.exceptions.GrafanaException;
+import com.thoughtworks.gauge.BeforeScenario;
 import com.thoughtworks.gauge.BeforeSpec;
 import com.thoughtworks.gauge.Step;
-
 import grafana.Grafana;
+import org.junit.BeforeClass;
 
-public class GrafanaStory {
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.junit.Assert.*;
+
+public class DashboardTests {
 
     Grafana grafana;
     String newDashboardUid;
 
-    @BeforeSpec
+    @BeforeScenario
     public void Setup() {
         String baseUrl = System.getenv("BASE_URL");
         String auth = System.getenv("AUTH");

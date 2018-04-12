@@ -11,6 +11,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import grafana.beans.Panel;
 import grafana.beans.Target;
 import grafana.beans.Template;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,38 @@ public class Grafana {
         this.client = new GrafanaClient(config);
     }
 
+    /**
+     * Initialize a Grafana API object with the admin authority
+     *
+     * @param baseUrl       base url of grafana
+     * @param adminUsername the admin username
+     * @param adminPassword the admin password
+     */
+    public Grafana(String baseUrl, String adminUsername, String adminPassword) {
+        GrafanaConfiguration config = new GrafanaConfiguration().host(baseUrl);
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder().addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request originReq = chain.request();
+                Request.Builder builder = originReq.newBuilder().header("Authorization",
+                        Credentials.basic(adminUsername, adminPassword));
+                Request newReq = builder.build();
+                return chain.proceed(newReq);
+            }
+        }).build();
+        this.client = new GrafanaClient(config, okHttpClient);
+    }
+
+    public OrganizationSuccessfulPost createOrganization(String organizationName)
+            throws IOException, GrafanaException {
+        GrafanaOrganization organization = new GrafanaOrganization().name(organizationName);
+        return this.client.createOrganization(organization);
+    }
+
+    public GrafanaOrganization getOrganization(String organizationName)
+            throws IOException, GrafanaException {
+        return this.client.getOrganization(organizationName);
+    }
 
     /**
      * Create a new dashboard from a YAML input stream
@@ -151,7 +184,7 @@ public class Grafana {
     /**
      * Get the uid of a dashboard
      *
-     * @param dashboardTitle the dashboard title
+     * @param dashboardTitle  the dashboard title
      * @param dashboardFolder the name of the folder which contains the dashboard
      * @return the dashboard uid
      */
