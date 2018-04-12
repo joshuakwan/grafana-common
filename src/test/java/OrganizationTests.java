@@ -1,8 +1,7 @@
-import com.appnexus.grafana.client.models.GrafanaOrganization;
-import com.appnexus.grafana.client.models.OrganizationSuccessfulPost;
-import com.appnexus.grafana.exceptions.GrafanaException;
+import grafana.beans.organization.GrafanaOrganization;
+import grafana.models.OrganizationSuccessfulPost;
+import grafana.exceptions.GrafanaException;
 import com.thoughtworks.gauge.BeforeScenario;
-import com.thoughtworks.gauge.BeforeSpec;
 import com.thoughtworks.gauge.Step;
 import grafana.Grafana;
 

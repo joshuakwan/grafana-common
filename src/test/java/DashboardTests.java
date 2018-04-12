@@ -1,13 +1,11 @@
-import com.appnexus.grafana.client.models.DashboardSuccessfulPost;
-import com.appnexus.grafana.client.models.GrafanaDashboard;
-import com.appnexus.grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
-import com.appnexus.grafana.exceptions.GrafanaDashboardDoesNotExistException;
-import com.appnexus.grafana.exceptions.GrafanaException;
+import grafana.beans.dashboard.DashboardSuccessfulPost;
+import grafana.models.GrafanaDashboard;
+import grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
+import grafana.exceptions.GrafanaDashboardDoesNotExistException;
+import grafana.exceptions.GrafanaException;
 import com.thoughtworks.gauge.BeforeScenario;
-import com.thoughtworks.gauge.BeforeSpec;
 import com.thoughtworks.gauge.Step;
 import grafana.Grafana;
-import org.junit.BeforeClass;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +37,12 @@ public class DashboardTests {
 
     @Step("Get the uid of dashboard <dashboardTitle>")
     public void testSearchDashboard(String dashboardTitle) {
-        String uid = this.grafana.getDashboardUid(dashboardTitle);
+        String uid = null;
+        try {
+            uid = this.grafana.getDashboardUid(dashboardTitle);
+        } catch (GrafanaDashboardDoesNotExistException e) {
+            e.printStackTrace();
+        }
         assertNotNull(uid);
         System.out.println(uid);
     }
@@ -68,6 +71,7 @@ public class DashboardTests {
         InputStream is = classloader.getResourceAsStream(filename);
         DashboardSuccessfulPost resp = this.grafana.updateDashboard(dashboardTitle,is);
         assertNotNull(resp);
+        System.out.print(resp);
     }
 
     @Step("Delete dashboard <dashboardTitle>")
