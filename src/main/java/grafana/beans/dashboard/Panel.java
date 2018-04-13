@@ -93,19 +93,32 @@ public class Panel {
 
     // What a CRAP!
     @JsonSetter("thresholds")
-    public void setThresholdsInternal(JsonNode thresholdsInternal){
-        if(thresholdsInternal !=null){
-            if(!thresholdsInternal.isArray()){
+    public void setThresholdsInternal(JsonNode thresholdsInternal) {
+        if (thresholdsInternal != null) {
+            if (!thresholdsInternal.isArray()) {
                 thresholds = new ArrayList<>();
-            } else{
+            } else {
                 thresholds = new ArrayList<>();
                 Iterator<JsonNode> nodeIterator = thresholdsInternal.iterator();
-                while(nodeIterator.hasNext()) {
+                while (nodeIterator.hasNext()) {
                     JsonNode entry = nodeIterator.next();
                     PanelThreshold threshold = new PanelThreshold();
-                    threshold.colorMode(entry.get("colorMode").textValue());
-                    threshold.fill(entry.get("fill").booleanValue());
-                    threshold.line(entry.get("line").booleanValue());
+                    if (entry.has("colorMode")) {
+                        threshold.colorMode(entry.get("colorMode").textValue());
+                    } else {
+                        threshold.colorMode("critical");
+                    }
+                    if (entry.has("fill")) {
+                        threshold.fill(entry.get("fill").booleanValue());
+                    } else {
+                        threshold.fill(true);
+                    }
+                    if (entry.has("line")) {
+                        threshold.line(entry.get("line").booleanValue());
+                    } else {
+                        threshold.line(true);
+                    }
+
                     threshold.op(entry.get("op").textValue());
                     threshold.value(entry.get("value").longValue());
                     thresholds.add(threshold);
@@ -115,7 +128,7 @@ public class Panel {
     }
 
     @JsonGetter("thresholds")
-    public ArrayList<PanelThreshold> getThresholds(){
+    public ArrayList<PanelThreshold> getThresholds() {
         return thresholds;
     }
 }

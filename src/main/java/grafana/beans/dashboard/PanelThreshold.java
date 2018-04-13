@@ -9,13 +9,13 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class PanelThreshold {
     @JsonProperty
-    String colorMode;
+    String colorMode = "critical";
 
     @JsonProperty
-    Boolean fill;
+    Boolean fill = true;
 
     @JsonProperty
-    Boolean line;
+    Boolean line = true;
 
     @JsonProperty
     String op;

@@ -83,12 +83,6 @@ panels:
         expr: irate(redis_keyspace_misses_total{addr="$addr"}[5m])
         legendFormat: misses
         intervalFactor: 2
-#    thresholds:
-#      - colorMode: critical
-#        fill: true
-#        line: true
-#        op: gt
-#        value: 10000
     xaxis:
       show: true
       mode: time
@@ -117,35 +111,8 @@ panels:
         legendFormat: max
         intervalFactor: 2
     thresholds:
-      - colorMode: critical
-        fill: true
-        line: true
-        op: gt
-        value: 100000
-#    alert:
-#      conditions:
-#        - evaluator:
-#            params:
-#              - 80000
-#            type: gt
-#          operator:
-#            type: and
-#          query:
-#            params:
-#              - A
-#              - 5m
-#              - now
-#          reducer:
-#            type: avg
-#          type: query
-#      executionErrorState: alerting
-#      frequency: 60s
-#      handler: 1
-#      message: Test Alert
-#      name: Total Memory Usage alert
-#      noDataState: no_data
-#      notifications:
-#        - id: 2
+      - op: gt
+        value: 30000
     xaxis:
       show: true
       mode: time
@@ -169,6 +136,27 @@ panels:
         expr: rate(redis_net_output_bytes_total{addr="$addr"}[5m])
         legendFormat: "{{ output }}"
         intervalFactor: 2
+#    alert:
+#      conditions:
+#        - evaluator:
+#            params:
+#              - 400
+#            type: gt
+#          operator:
+#            type: and
+#          query:
+#            params:
+#              - A
+#              - 5m
+#              - now
+#          reducer:
+#            type: avg
+#          type: query
+#      executionErrorState: alerting
+#      frequency: 60s
+#      handler: 1
+#      name: Network I/O alert
+#      noDataState: no_data
     xaxis:
       mode: time
     yaxes:
