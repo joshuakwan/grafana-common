@@ -163,6 +163,9 @@ The list may change in the future
 * panel.xaxis.show: true
 * panel.yaxes.logBase: 1
 * panel.yaxes.show: true
+* panel.thresholds[].color: critical
+* panel.thresholds[].fill: true
+* panel.thresholds[].line: true
 
 
 

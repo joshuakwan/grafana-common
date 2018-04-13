@@ -5,7 +5,7 @@
  Create dashboard from YAML file "redis_prometheus.yaml"
 * Get the uid of dashboard "Redis"
 * Get the content of dashboard "Redis"
- Update dashboard "Redis" from YAML file "redis_prometheus.yaml"
+* Update dashboard "Redis" from YAML file "redis_prometheus.yaml"
  Delete dashboard "Redis"
 
 ## Test organization functions

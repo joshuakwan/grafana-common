@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 */
 package grafana.beans.dashboard;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,24 +11,18 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(fluent = true)
 public class PanelAlertCondition {
-
+    @JsonProperty
     PanelAlertConditionEvaluator evaluator;
-    PanelAlertConditionQuery query;
-    PanelAlertConditionReducer reducer;
+
+    @JsonProperty
     PanelAlertConditionOperator operator;
-    Type type;
 
-    public enum Type {
-        QUERY("query");
-        private final String value;
+    @JsonProperty
+    PanelAlertConditionQuery query;
 
-        Type(String s) {
-            value = s;
-        }
+    @JsonProperty
+    PanelAlertConditionReducer reducer;
 
-        @JsonValue
-        public String value() {
-            return value;
-        }
-    }
+    @JsonProperty
+    String type;
 }
