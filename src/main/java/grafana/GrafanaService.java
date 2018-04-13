@@ -1,11 +1,15 @@
 /* Licensed under Apache-2.0 */
 package grafana;
 
+import grafana.beans.GrafanaDashboard;
+import grafana.beans.GrafanaMessage;
+import grafana.beans.alert.AlertNotification;
+import grafana.beans.dashboard.PanelAlert;
 import grafana.beans.dashboard.DashboardSuccessfulDelete;
 import grafana.beans.dashboard.DashboardSuccessfulPost;
 import grafana.beans.organization.GrafanaOrganization;
 import grafana.beans.GrafanaSearchResult;
-import grafana.models.*;
+import grafana.beans.organization.OrganizationSuccessfulPost;
 
 import java.util.List;
 
@@ -74,7 +78,7 @@ public interface GrafanaService {
 
     //Alerts
     @GET(GRAFANA_ALERTS + "{id}")
-    Call<DashboardPanelAlert> getAlert(
+    Call<PanelAlert> getAlert(
             @Header(AUTHORIZATION) String authorization, @Path("id") Integer id);
 
     // Search

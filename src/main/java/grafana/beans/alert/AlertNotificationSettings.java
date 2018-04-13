@@ -1,12 +1,12 @@
 /* Licensed under Apache-2.0 */
-package grafana.beans.dashboard;
+package grafana.beans.alert;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardTemplateListCurrent {
-  String text;
-  String value;
+public class AlertNotificationSettings {
+    private String httpMethod;
+    private String url;
 }

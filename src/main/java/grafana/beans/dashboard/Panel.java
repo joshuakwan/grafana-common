@@ -1,10 +1,9 @@
 package grafana.beans.dashboard;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import grafana.models.DashboardPanelAlert;
-import grafana.models.DashboardPanelThreshold;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import grafana.GrafanaDeserializer;
 import lombok.Data;
-import lombok.Value;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.List;
 
 @Data
 @Accessors(fluent = true)
+//@JsonDeserialize(using = GrafanaDeserializer.class)
 public class Panel {
     @JsonProperty
     String title;
@@ -26,7 +26,7 @@ public class Panel {
     String format;
 
     @JsonProperty
-    Integer fill;
+    Integer fill = 1;
 
     @JsonProperty
     Integer linewidth = 1;
@@ -56,22 +56,22 @@ public class Panel {
     Integer minSpan;
 
     @JsonProperty
-    DashboardPanelGridPosition gridPos;
+    PanelGridPosition gridPos;
 
     @JsonProperty
-    DashboardPanelLegend legend;
+    PanelLegend legend;
 
     @JsonProperty
-    DashboardPanelTooltip tooltip;
+    PanelTooltip tooltip;
 
     @JsonProperty
     ArrayList<Target> targets;
 
     @JsonProperty
-    DashboardPanelXAxis xaxis;
+    PanelXAxis xaxis;
 
     @JsonProperty
-    ArrayList<DashboardPanelYAxis> yaxes;
+    ArrayList<PanelYAxis> yaxes;
 
     @JsonProperty
     Boolean editable;
@@ -83,8 +83,8 @@ public class Panel {
     Integer id;
 
     @JsonProperty
-    DashboardPanelAlert alert;
+    PanelAlert alert;
 
     @JsonProperty
-    List<DashboardPanelThreshold> thresholds;
+    List<PanelThreshold> thresholds;
 }

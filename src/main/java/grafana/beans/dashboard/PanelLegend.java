@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardPanelLegend {
+public class PanelLegend {
     @JsonProperty
     Boolean avg;
 

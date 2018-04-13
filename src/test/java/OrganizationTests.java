@@ -1,5 +1,5 @@
 import grafana.beans.organization.GrafanaOrganization;
-import grafana.models.OrganizationSuccessfulPost;
+import grafana.beans.organization.OrganizationSuccessfulPost;
 import grafana.exceptions.GrafanaException;
 import com.thoughtworks.gauge.BeforeScenario;
 import com.thoughtworks.gauge.Step;

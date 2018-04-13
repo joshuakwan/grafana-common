@@ -6,10 +6,16 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardPanelXAxis {
+public class PanelGridPosition {
     @JsonProperty
-    Boolean show = true;
+    Integer h;
 
     @JsonProperty
-    String mode;
+    Integer w;
+
+    @JsonProperty
+    Integer x;
+
+    @JsonProperty
+    Integer y;
 }

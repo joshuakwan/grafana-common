@@ -1,11 +1,11 @@
 /* Licensed under Apache-2.0 */
-package grafana.beans.dashboard;
+package grafana.beans;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardSuccessfulDelete {
-    String title;
+public class GrafanaMessage {
+    String message;
 }

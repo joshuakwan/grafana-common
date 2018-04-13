@@ -5,8 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class GrafanaOrganization {
-    Integer id;
-    String name;
-    OrganizationAddress address;
+public class OrganizationSuccessfulPost {
+    String orgId;
+    String message;
 }

@@ -1,3 +1,4 @@
+/* Licensed under Apache-2.0 */
 package grafana.beans.dashboard;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6,16 +7,10 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardPanelGridPosition {
+public class TemplateListCurrent {
     @JsonProperty
-    Integer h;
+    String text;
 
     @JsonProperty
-    Integer w;
-
-    @JsonProperty
-    Integer x;
-
-    @JsonProperty
-    Integer y;
+    String value;
 }

@@ -6,16 +6,20 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import grafana.beans.GrafanaDashboard;
+import grafana.beans.GrafanaMessage;
+import grafana.beans.GrafanaSearchResult;
+import grafana.beans.alert.AlertNotification;
 import grafana.beans.dashboard.DashboardSuccessfulDelete;
 import grafana.beans.dashboard.DashboardSuccessfulPost;
-import grafana.beans.GrafanaSearchResult;
-import grafana.beans.dashboard.Template;
+import grafana.beans.dashboard.Meta;
+import grafana.beans.dashboard.PanelAlert;
 import grafana.beans.organization.GrafanaOrganization;
+import grafana.beans.organization.OrganizationSuccessfulPost;
 import grafana.configuration.GrafanaConfiguration;
 import grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
 import grafana.exceptions.GrafanaDashboardDoesNotExistException;
 import grafana.exceptions.GrafanaException;
-import grafana.models.*;
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,11 +30,9 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-
 
 public class Grafana {
     private final GrafanaConfiguration config;
@@ -409,33 +411,8 @@ public class Grafana {
     }
 
     private GrafanaDashboard buildGrafanaDashboard(grafana.beans.dashboard.Dashboard data) {
-        Dashboard dashboard = new Dashboard();
-        dashboard.title(data.title());
-        dashboard.refresh(data.refresh());
-        dashboard.schemaVersion(data.schemaVersion());
-
-        dashboard.time(data.time());
-
-        ArrayList<DashboardTemplateList> templateLists = new ArrayList<>();
-        for (Template templateData : data.templating()) {
-            DashboardTemplateList templateList = new DashboardTemplateList();
-            templateList.name(templateData.getName());
-            templateList.type(templateData.getType());
-            templateList.datasource(templateData.getDatasource());
-            templateList.query(templateData.getQuery());
-            templateList.refresh(templateData.getRefresh());
-            templateList.multi(templateData.getMulti());
-            templateList.includeAll(templateData.getIncludeAll());
-            templateLists.add(templateList);
-        }
-
-        DashboardTemplate templating = new DashboardTemplate().list(templateLists);
-        dashboard.templating(templating);
-
-
-        dashboard.panels(data.panels());
-        DashboardMeta dashboardMeta = new DashboardMeta().canSave(true).slug(data.title());
-        return new GrafanaDashboard().meta(dashboardMeta).dashboard(dashboard);
+        Meta dashboardMeta = new Meta().canSave(true).slug(data.title());
+        return new GrafanaDashboard().meta(dashboardMeta).dashboard(data);
     }
 
     /**
@@ -549,9 +526,9 @@ public class Grafana {
      * @throws GrafanaException if Grafana returns an error when trying to find the alert.
      * @throws IOException      if a problem occurred talking to the server.
      */
-    public DashboardPanelAlert getAlert(Integer id) throws GrafanaException, IOException {
+    public PanelAlert getAlert(Integer id) throws GrafanaException, IOException {
 
-        Response<DashboardPanelAlert> response = service.getAlert(config.apiKey(), id).execute();
+        Response<PanelAlert> response = service.getAlert(config.apiKey(), id).execute();
 
         if (response.isSuccessful()) {
             return response.body();

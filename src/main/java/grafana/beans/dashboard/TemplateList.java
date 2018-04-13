@@ -13,6 +13,9 @@ public class TemplateList {
     String name;
 
     @JsonProperty
+    String label;
+
+    @JsonProperty
     String type;
 
     @JsonProperty
@@ -25,14 +28,17 @@ public class TemplateList {
     Integer refresh;
 
     @JsonProperty
+    Integer hide;
+
+    @JsonProperty
     Boolean multi;
 
     @JsonProperty
     Boolean includeAll;
 
     @JsonProperty
-    DashboardTemplateListCurrent current;
+    TemplateListCurrent current;
 
     @JsonProperty
-    ArrayList<DashboardTemplateListOption> options;
+    ArrayList<TemplateListOption> options;
 }

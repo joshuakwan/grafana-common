@@ -43,5 +43,5 @@ public class Dashboard {
     ArrayList<Panel> panels;
 
     @JsonProperty
-    ArrayList<Template> templating;
+    Template templating;
 }

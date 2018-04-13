@@ -1,5 +1,5 @@
 import grafana.beans.dashboard.DashboardSuccessfulPost;
-import grafana.models.GrafanaDashboard;
+import grafana.beans.GrafanaDashboard;
 import grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
 import grafana.exceptions.GrafanaDashboardDoesNotExistException;
 import grafana.exceptions.GrafanaException;
@@ -47,20 +47,21 @@ public class DashboardTests {
         System.out.println(uid);
     }
 
-    @Step("Verify dashboard <dashboardTitle> is created")
-    public void testGrafanaGetDashboardByName(String dashboardTitle) {
-        GrafanaDashboard dashboard;
+    @Step("Get the content of dashboard <dashboardTitle>")
+    public void testGetDashboard(String dashboardTitle) {
         try {
-            dashboard = this.grafana.getDashboard(dashboardTitle, null);
+            GrafanaDashboard dashboard = this.grafana.getDashboard(dashboardTitle);
             assertNotNull(dashboard);
-            System.out.println(dashboard.dashboard());
+            System.out.println(dashboard);
         } catch (GrafanaDashboardDoesNotExistException e) {
-            fail("Dashboard " + dashboardTitle + " not exist");
+            e.printStackTrace();
+            fail();
         } catch (GrafanaException e) {
-            fail("Shit happens with Grafana");
+            e.printStackTrace();
+            fail();
         } catch (IOException e) {
             e.printStackTrace();
-            fail("Shit happens with I/O");
+            fail();
         }
     }
 

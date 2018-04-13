@@ -6,22 +6,16 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
-public class DashboardPanelYAxis {
+public class PanelTooltip {
     @JsonProperty
-    String format;
+    Boolean msResolution;
 
     @JsonProperty
-    Integer logBase = 1;
+    Boolean shared;
 
     @JsonProperty
-    Boolean show = true;
+    Integer sort;
 
     @JsonProperty
-    Integer min;
-
-    @JsonProperty
-    Integer max;
-
-    @JsonProperty
-    String label;
+    String valueType;
 }
