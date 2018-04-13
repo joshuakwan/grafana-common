@@ -4,11 +4,11 @@
 
  Create dashboard from YAML file "redis_prometheus.yaml"
 * Get the uid of dashboard "Redis"
- Verify dashboard "Redis" is created
-* Update dashboard "Redis" from YAML file "redis_prometheus.yaml"
- Delete dashboard "Redis Prometheus"
+* Get the content of dashboard "Redis"
+ Update dashboard "Redis" from YAML file "redis_prometheus.yaml"
+ Delete dashboard "Redis"
 
 ## Test organization functions
 
-* Create organization "Org Abe"
+ Create organization "Org Abe"
 * Get organization "Tenant A"
