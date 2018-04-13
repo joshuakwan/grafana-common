@@ -2,14 +2,15 @@ title: Redis
 datasource: local-prom
 refresh: 30s
 time:
-  from: now-1h
+  from: now-2h
   to: now
 templating:
-  - name: addr
-    type: query
-    datasource: local-prom
-    query: label_values(redis_up, addr)
-    refresh: 1
+  list:
+    - name: addr
+      type: query
+      datasource: local-prom
+      query: label_values(redis_up, addr)
+      refresh: 1
 panels:
   - title: Uptime
     datasource: local-prom
@@ -39,7 +40,7 @@ panels:
         expr: redis_connected_clients{addr="$addr"}
   - title: Commands Executed / sec
     datasource: local-prom
-    linewidth: 2
+    linewidth: 5
     stack: true
     legend:
       show: false
@@ -82,6 +83,12 @@ panels:
         expr: irate(redis_keyspace_misses_total{addr="$addr"}[5m])
         legendFormat: misses
         intervalFactor: 2
+#    thresholds:
+#      - colorMode: critical
+#        fill: true
+#        line: true
+#        op: gt
+#        value: 10000
     xaxis:
       show: true
       mode: time
@@ -109,6 +116,36 @@ panels:
         expr: redis_memory_max_bytes{addr=~"$addr"}
         legendFormat: max
         intervalFactor: 2
+    thresholds:
+      - colorMode: critical
+        fill: true
+        line: true
+        op: gt
+        value: 100000
+#    alert:
+#      conditions:
+#        - evaluator:
+#            params:
+#              - 80000
+#            type: gt
+#          operator:
+#            type: and
+#          query:
+#            params:
+#              - A
+#              - 5m
+#              - now
+#          reducer:
+#            type: avg
+#          type: query
+#      executionErrorState: alerting
+#      frequency: 60s
+#      handler: 1
+#      message: Test Alert
+#      name: Total Memory Usage alert
+#      noDataState: no_data
+#      notifications:
+#        - id: 2
     xaxis:
       show: true
       mode: time

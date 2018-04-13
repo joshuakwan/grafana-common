@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 */
 package grafana.beans.dashboard;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.List;
@@ -13,22 +14,9 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(fluent = true)
 public class PanelAlertConditionEvaluator {
-
+    @JsonProperty
     List<Double> params;
-    Type type;
 
-    public enum Type {
-        LESS_THAN("lt"),
-        GREATER_THAN("gt");
-        private final String value;
-
-        Type(String s) {
-            value = s;
-        }
-
-        @JsonValue
-        public String value() {
-            return value;
-        }
-    }
+    @JsonProperty
+    String type;
 }

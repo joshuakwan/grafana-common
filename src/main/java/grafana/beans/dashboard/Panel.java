@@ -1,13 +1,16 @@
 package grafana.beans.dashboard;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import grafana.GrafanaDeserializer;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 @Data
 @Accessors(fluent = true)
@@ -86,5 +89,33 @@ public class Panel {
     PanelAlert alert;
 
     @JsonProperty
-    List<PanelThreshold> thresholds;
+    ArrayList<PanelThreshold> thresholds;
+
+    // What a CRAP!
+    @JsonSetter("thresholds")
+    public void setThresholdsInternal(JsonNode thresholdsInternal){
+        if(thresholdsInternal !=null){
+            if(!thresholdsInternal.isArray()){
+                thresholds = new ArrayList<>();
+            } else{
+                thresholds = new ArrayList<>();
+                Iterator<JsonNode> nodeIterator = thresholdsInternal.iterator();
+                while(nodeIterator.hasNext()) {
+                    JsonNode entry = nodeIterator.next();
+                    PanelThreshold threshold = new PanelThreshold();
+                    threshold.colorMode(entry.get("colorMode").textValue());
+                    threshold.fill(entry.get("fill").booleanValue());
+                    threshold.line(entry.get("line").booleanValue());
+                    threshold.op(entry.get("op").textValue());
+                    threshold.value(entry.get("value").longValue());
+                    thresholds.add(threshold);
+                }
+            }
+        }
+    }
+
+    @JsonGetter("thresholds")
+    public ArrayList<PanelThreshold> getThresholds(){
+        return thresholds;
+    }
 }

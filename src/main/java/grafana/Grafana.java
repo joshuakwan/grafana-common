@@ -10,6 +10,7 @@ import grafana.beans.GrafanaDashboard;
 import grafana.beans.GrafanaMessage;
 import grafana.beans.GrafanaSearchResult;
 import grafana.beans.alert.AlertNotification;
+import grafana.beans.dashboard.Dashboard;
 import grafana.beans.dashboard.DashboardSuccessfulDelete;
 import grafana.beans.dashboard.DashboardSuccessfulPost;
 import grafana.beans.dashboard.Meta;
@@ -146,9 +147,11 @@ public class Grafana {
      */
     public DashboardSuccessfulPost createDashboard(InputStream yamlStream)
             throws IOException, GrafanaException {
-        grafana.beans.dashboard.Dashboard data = getYamlData(yamlStream);
-        GrafanaDashboard grafanaDashboard = buildGrafanaDashboard(data);
-        return this.createDashboard(grafanaDashboard);
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        Dashboard data = mapper.readValue(yamlStream, Dashboard.class);
+        Meta dashboardMeta = new Meta().canSave(true).slug(data.title());
+        GrafanaDashboard newDashboard = new GrafanaDashboard().meta(dashboardMeta).dashboard(data);
+        return this.createDashboard(newDashboard);
     }
 
     /**
@@ -242,8 +245,10 @@ public class Grafana {
         GrafanaDashboard existingDashboard = this.getDashboard(dashboardTitle, dashboardFolder);
 
         // 2. build new dashboard
-        grafana.beans.dashboard.Dashboard data = getYamlData(yamlStream);
-        GrafanaDashboard newDashboard = buildGrafanaDashboard(data);
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        Dashboard data = mapper.readValue(yamlStream, Dashboard.class);
+        Meta dashboardMeta = new Meta().canSave(true).slug(data.title());
+        GrafanaDashboard newDashboard = new GrafanaDashboard().meta(dashboardMeta).dashboard(data);
 
         // 3. make the update
         // 3.1. specify the version
@@ -350,11 +355,6 @@ public class Grafana {
         }
     }
 
-    private grafana.beans.dashboard.Dashboard getYamlData(InputStream yamlStream) throws IOException {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        return mapper.readValue(yamlStream, grafana.beans.dashboard.Dashboard.class);
-    }
-
     private String searchDashboard(String dashboardTitle, String dashboardFolder)
             throws GrafanaDashboardDoesNotExistException {
         List<GrafanaSearchResult> response = null;
@@ -408,11 +408,6 @@ public class Grafana {
         } else {
             throw GrafanaException.withErrorBody(response.errorBody());
         }
-    }
-
-    private GrafanaDashboard buildGrafanaDashboard(grafana.beans.dashboard.Dashboard data) {
-        Meta dashboardMeta = new Meta().canSave(true).slug(data.title());
-        return new GrafanaDashboard().meta(dashboardMeta).dashboard(data);
     }
 
     /**
