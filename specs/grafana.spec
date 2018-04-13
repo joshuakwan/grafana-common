@@ -12,3 +12,6 @@
 
  Create organization "Org Abe"
 * Get organization "Tenant A"
+* Get current organization
+* Get current organization users
+* Add user "joshuakwan" to current organization as "Editor"

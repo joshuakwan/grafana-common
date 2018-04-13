@@ -11,8 +11,10 @@ import grafana.beans.organization.GrafanaOrganization;
 import grafana.beans.GrafanaSearchResult;
 import grafana.beans.organization.OrganizationSuccessfulPost;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import grafana.beans.user.User;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -40,6 +42,18 @@ public interface GrafanaService {
     @GET("api/orgs/name/{organizationName}")
     Call<GrafanaOrganization> getOrganization(
             @Path("organizationName") String organizationName);
+
+    @GET("api/org/")
+    Call<GrafanaOrganization> getCurrentOrganization(
+            @Header(AUTHORIZATION) String authorization);
+
+    @GET("api/org/users")
+    Call<ArrayList<User>> getCurrentOrganizationUsers(
+            @Header(AUTHORIZATION) String authorization);
+
+    @POST("api/org/users")
+    Call<GrafanaMessage> addUserToCurrentOrganization(
+            @Header(AUTHORIZATION) String authorization, @Body User user);
 
     //Dashboards
     @GET(GRAFANA_DASHBOARDS_UID + "{dashboardUid}")

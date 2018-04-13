@@ -17,6 +17,7 @@ import grafana.beans.dashboard.Meta;
 import grafana.beans.dashboard.PanelAlert;
 import grafana.beans.organization.GrafanaOrganization;
 import grafana.beans.organization.OrganizationSuccessfulPost;
+import grafana.beans.user.User;
 import grafana.configuration.GrafanaConfiguration;
 import grafana.exceptions.GrafanaDashboardCouldNotDeleteException;
 import grafana.exceptions.GrafanaDashboardDoesNotExistException;
@@ -31,6 +32,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
@@ -128,6 +130,37 @@ public class Grafana {
     public GrafanaOrganization getOrganization(String organizationName)
             throws GrafanaException, IOException {
         Response<GrafanaOrganization> response = service.getOrganization(organizationName).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    public GrafanaOrganization getCurrentOrganization()
+            throws IOException, GrafanaException {
+        Response<GrafanaOrganization> response = service.getCurrentOrganization(this.config.apiKey()).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    public ArrayList<User> getCurrentOrganizationUsers()
+            throws IOException, GrafanaException {
+        Response<ArrayList<User>> response = service.getCurrentOrganizationUsers(this.config.apiKey()).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    public GrafanaMessage addUserToCurrentOrganization(String loginOrEmail, String role)
+            throws IOException, GrafanaException {
+        User user = new User().loginOrEmail(loginOrEmail).role(role);
+        Response<GrafanaMessage> response = service.addUserToCurrentOrganization(this.config.apiKey(), user).execute();
         if (response.isSuccessful()) {
             return response.body();
         } else {
