@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 */
-package grafana.beans;
+package grafana.beans.messages;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

@@ -7,7 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import grafana.beans.GrafanaDashboard;
-import grafana.beans.GrafanaMessage;
+import grafana.beans.datasource.DatasourceSuccessfulCreate;
+import grafana.beans.messages.GrafanaMessage;
 import grafana.beans.GrafanaSearchResult;
 import grafana.beans.alert.AlertNotification;
 import grafana.beans.dashboard.Dashboard;
@@ -15,6 +16,7 @@ import grafana.beans.dashboard.DashboardSuccessfulDelete;
 import grafana.beans.dashboard.DashboardSuccessfulPost;
 import grafana.beans.dashboard.Meta;
 import grafana.beans.dashboard.PanelAlert;
+import grafana.beans.datasource.Datasource;
 import grafana.beans.organization.GrafanaOrganization;
 import grafana.beans.organization.OrganizationSuccessfulPost;
 import grafana.configuration.GrafanaConfiguration;
@@ -133,6 +135,72 @@ public class Grafana {
         } else {
             throw GrafanaException.withErrorBody(response.errorBody());
         }
+    }
+
+    // Datasources
+
+
+    /**
+     * Get all datasources
+     *
+     * @return Datasource objects
+     * @throws IOException
+     * @throws GrafanaException
+     */
+    public List<Datasource> getAllDatasources()
+            throws IOException, GrafanaException {
+        Response<List<Datasource>> response = service.getAllDatasources(this.config.apiKey()).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    /**
+     * Create a new datasource
+     *
+     * @param datasource the Datasource object to create
+     * @return the created Datasource object
+     * @throws IOException
+     * @throws GrafanaException
+     */
+    public DatasourceSuccessfulCreate createDatasource(Datasource datasource)
+            throws IOException, GrafanaException {
+        Response<DatasourceSuccessfulCreate> response = service.createDatasource(this.config.apiKey(), datasource).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    public GrafanaMessage deleteDatasource(String datasourceName)
+            throws IOException, GrafanaException {
+        Response<GrafanaMessage> response = service.deleteDatasource(this.config.apiKey(), datasourceName).execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            throw GrafanaException.withErrorBody(response.errorBody());
+        }
+    }
+
+    /**
+     * Create a new datasource with basic information
+     *
+     * @param name   the name of the new datasource
+     * @param type   the type name of the new datasource
+     * @param url    the url of the new datasource
+     * @param access the access mode of the new datasource, can be "proxy" or "direct"
+     * @return
+     * @throws IOException
+     * @throws GrafanaException
+     */
+    public DatasourceSuccessfulCreate createDatasource(String name, String type, String url, String access)
+            throws IOException, GrafanaException {
+        Datasource newDatasource = new Datasource();
+        newDatasource.name(name).type(type).url(url).access(access);
+        return this.createDatasource(newDatasource);
     }
 
     // Dashboard

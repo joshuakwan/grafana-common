@@ -6,6 +6,8 @@ An easy-to-use Java client to manipulate Grafana via API calls.
 
 * Support the creation, deletion, update and retrieval of the dashboards.
 * Support YAML presentation of the dashboards.
+* Support basic organization APIs.
+* Support basic data source APIs.
 
 More features to come.
 
