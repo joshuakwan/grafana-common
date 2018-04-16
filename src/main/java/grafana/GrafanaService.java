@@ -2,11 +2,13 @@
 package grafana;
 
 import grafana.beans.GrafanaDashboard;
-import grafana.beans.GrafanaMessage;
+import grafana.beans.datasource.DatasourceSuccessfulCreate;
+import grafana.beans.messages.GrafanaMessage;
 import grafana.beans.alert.AlertNotification;
 import grafana.beans.dashboard.PanelAlert;
 import grafana.beans.dashboard.DashboardSuccessfulDelete;
 import grafana.beans.dashboard.DashboardSuccessfulPost;
+import grafana.beans.datasource.Datasource;
 import grafana.beans.organization.GrafanaOrganization;
 import grafana.beans.GrafanaSearchResult;
 import grafana.beans.organization.OrganizationSuccessfulPost;
@@ -31,6 +33,18 @@ public interface GrafanaService {
     String GRAFANA_SEARCH = "api/search/";
 
     String AUTHORIZATION = "Authorization";
+
+    // Datasources
+    @GET("api/datasources")
+    Call<List<Datasource>> getAllDatasources(@Header(AUTHORIZATION) String authorization);
+
+    @POST("api/datasources")
+    Call<DatasourceSuccessfulCreate> createDatasource(
+            @Header(AUTHORIZATION) String authorization, @Body Datasource datasource);
+
+    @DELETE("api/datasources/name/{datasourceName}")
+    Call<GrafanaMessage> deleteDatasource(
+            @Header(AUTHORIZATION) String authorization,@Path("datasourceName") String datasourceName);
 
     // Organizations
     @POST("api/orgs/")
